@@ -218,7 +218,7 @@ void printToken(Token *tok) {
     typeString = "EOF";
     break;
 
-  // Identifiers + Literals
+  // identifiers + literals
   case IDENT:
     typeString = "IDENT";
     break;
@@ -226,7 +226,7 @@ void printToken(Token *tok) {
     typeString = "INT";
     break;
 
-  // Operators
+  // operators
   case ASSIGN:
     typeString = "ASSIGN";
     break;
@@ -252,7 +252,7 @@ void printToken(Token *tok) {
     typeString = "NOT_EQ";
     break;
 
-  // Comparisons
+  // comparisons
   case LT:
     typeString = "LT";
     break;
@@ -260,7 +260,7 @@ void printToken(Token *tok) {
     typeString = "GT";
     break;
 
-  // Delimiters
+  // delimiters
   case COMMA:
     typeString = "COMMA";
     break;
@@ -280,7 +280,7 @@ void printToken(Token *tok) {
     typeString = "RBRACE";
     break;
 
-  // Keywords
+  // keywords
   case FUNCTION:
     typeString = "FUNCTION";
     break;

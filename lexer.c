@@ -3,9 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Creates a new Lexer
+// creates a new Lexer
 Lexer *newLexer(char *input) {
-  // First, memory must be allocated to the heap so this lexer can persist
+  // first, memory must be allocated to the heap so this lexer can persist
   // across multiple functions.
   Lexer *lexer = (Lexer *)malloc(sizeof(Lexer));
 
@@ -14,7 +14,7 @@ Lexer *newLexer(char *input) {
     return NULL;
   }
 
-  // Memory is not allocated to input, because it is passed into the function,
+  // memory is not allocated to input, because it is passed into the function,
   // meaning it should be handled already
   lexer->input = input;
   lexer->position = 0;
@@ -27,12 +27,12 @@ Lexer *newLexer(char *input) {
 }
 
 void readChar(Lexer *l) {
-  // If we have reached the end of the string input, set the current character
+  // if we have reached the end of the string input, set the current character
   // to 0 (null character)
   if (l->readPosition > strlen(l->input)) {
     l->ch = '\0';
   } else {
-    // Set the current character to the character at the readPosition
+    // set the current character to the character at the readPosition
     l->ch = l->input[l->readPosition];
   }
 

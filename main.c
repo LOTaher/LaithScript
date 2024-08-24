@@ -14,6 +14,7 @@ int main(int argc, char *argv[]) {
     while (1) {
       printf("%s", PROMPT);
 
+      // wait on user input
       if (fgets(input, sizeof(input), stdin) == NULL) {
         break;
       }
@@ -30,7 +31,6 @@ int main(int argc, char *argv[]) {
       Lexer *lexer = newLexer(input);
 
       // tokenization loop
-
       Token *token;
       while ((token = nextToken(lexer)) != NULL && token->type != EOF_TOKEN) {
         printToken(token);

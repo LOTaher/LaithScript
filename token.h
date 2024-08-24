@@ -2,15 +2,15 @@
 #include "lexer.h"
 #include <stdbool.h>
 
-// here we define the different type of tokens are lexer will parse the source
+// define the different type of tokens are lexer will parse the source
 // code to.
 typedef enum {
-  ILLEGAL,   // Illegal Character
+  ILLEGAL,   // illegal character
   EOF_TOKEN, // EOF
 
   // identifiers + literals
-  IDENT, // Identifier (add, foobar, x, y, ...)
-  INT,   // Integer (12345)
+  IDENT, // identifier (add, foobar, x, y, ...)
+  INT,   // integer (12345)
 
   // operators
   ASSIGN,   // =
@@ -43,7 +43,7 @@ typedef enum {
   RETURN,   // return
 } TokenType;
 
-// here is the actual token data structure
+// the actual token data structure
 typedef struct {
   TokenType type;
   char *literal;
