@@ -19,6 +19,8 @@ typedef enum {
   BANG,     // !
   ASTERISK, // *
   SLASH,    // /
+  EQ,       // ==
+  NOT_EQ,   // !=
 
   LT, // <
   GT, // >
@@ -31,8 +33,14 @@ typedef enum {
   LBRACE,    // {
   RBRACE,    // }
 
+  // keywords
   FUNCTION, // fn
-  LET       // let
+  LET,      // let
+  TRUE,     // true
+  FALSE,    // false
+  IF,       // if
+  ELSE,     // else
+  RETURN,   // return
 } TokenType;
 
 // here is the actual token data structure
@@ -49,5 +57,6 @@ bool isLetter(unsigned int ch);
 bool isDigit(unsigned int ch);
 TokenType lookupIdentifier(char *identifier);
 void skipWhiteSpace(Lexer *l);
+unsigned int peekChar(Lexer *l);
 
 #endif

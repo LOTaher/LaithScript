@@ -1,8 +1,8 @@
 #include "token.h"
-#include "lexer.h"
 #include <stdlib.h>
 #include <string.h>
 
+// return the token of the character under examination
 Token *nextToken(Lexer *l) {
   Token *tok;
 
@@ -10,8 +10,21 @@ Token *nextToken(Lexer *l) {
 
   switch (l->ch) {
   case '=':
-    tok = newToken(ASSIGN, l->ch);
-    break;
+    if (peekChar(l) == '=') {
+      unsigned int ch = l->ch;
+      readChar(l);
+      tok = (Token *)malloc(sizeof(Token));
+      tok->literal =
+          (char *)malloc(3 * sizeof(char)); // two chars and a null character
+      tok->literal[0] = ch;
+      tok->literal[1] = l->ch;
+      tok->literal[2] = '\0';
+      tok->type = EQ;
+      break;
+    } else {
+      newToken(ASSIGN, l->ch);
+      break;
+    }
   case ';':
     tok = newToken(SEMICOLON, l->ch);
     break;
@@ -33,6 +46,36 @@ Token *nextToken(Lexer *l) {
   case '}':
     tok = newToken(RBRACE, l->ch);
     break;
+  case '-':
+    tok = newToken(MINUS, l->ch);
+    break;
+  case '!':
+    if (peekChar(l) == '=') {
+      unsigned int ch = l->ch;
+      tok = (Token *)malloc(sizeof(Token));
+      tok->literal =
+          (char *)malloc(3 * sizeof(char)); // two chars and a null character
+      tok->literal[0] = ch;
+      tok->literal[1] = l->ch;
+      tok->literal[2] = '\0';
+      tok->type = NOT_EQ;
+      break;
+    } else {
+      tok = newToken(BANG, l->ch);
+      break;
+    }
+  case '/':
+    tok = newToken(SLASH, l->ch);
+    break;
+  case '*':
+    tok = newToken(ASTERISK, l->ch);
+    break;
+  case '<':
+    tok = newToken(LT, l->ch);
+    break;
+  case '>':
+    tok = newToken(GT, l->ch);
+    break;
   case '\0':
     tok = (Token *)malloc(sizeof(Token));
     tok->literal = "";
@@ -45,8 +88,8 @@ Token *nextToken(Lexer *l) {
       tok->type = lookupIdentifier(tok->literal);
       return tok;
     } else if (isDigit(l->ch)) {
-        tok->type = INT;
-        tok->literal = readNumber(l);
+      tok->type = INT;
+      tok->literal = readNumber(l);
     } else {
       tok = newToken(ILLEGAL, l->ch);
     }
@@ -96,22 +139,22 @@ char *readIdentifier(Lexer *l) {
   return identifier;
 }
 
-char* readNumber(Lexer *l) {
-    int position = l->position;
+char *readNumber(Lexer *l) {
+  int position = l->position;
 
-    while (isDigit(l->ch)) {
-        readChar(l);
-    }
+  while (isDigit(l->ch)) {
+    readChar(l);
+  }
 
-    int lengthOfNumber = l->position - position;
+  int lengthOfNumber = l->position - position;
 
-    char* number = (char*) malloc(sizeof(lengthOfNumber) + 1);
+  char *number = (char *)malloc(sizeof(lengthOfNumber) + 1);
 
-    strncpy(number, &l->input[position], lengthOfNumber);
+  strncpy(number, &l->input[position], lengthOfNumber);
 
-    number[lengthOfNumber] = '\0';
+  number[lengthOfNumber] = '\0';
 
-    return number;
+  return number;
 }
 
 bool isLetter(unsigned int ch) {
@@ -119,22 +162,38 @@ bool isLetter(unsigned int ch) {
 }
 
 // LaithScript only supports integers...
-bool isDigit(unsigned int ch) {
-    return '0' <= ch && ch <= '9';
-}
+bool isDigit(unsigned int ch) { return '0' <= ch && ch <= '9'; }
 
 TokenType lookUpIdentifier(char *identifier) {
-    if (strcmp(identifier, "fn") == 0) {
-        return FUNCTION;
-    } else if (strcmp(identifier, "let") == 0) {
-        return LET;
-    } else {
-        return IDENT;
-    }
+  if (strcmp(identifier, "fn") == 0) {
+    return FUNCTION;
+  } else if (strcmp(identifier, "let") == 0) {
+    return LET;
+  } else if (strcmp(identifier, "true") == 0) {
+    return TRUE;
+  } else if (strcmp(identifier, "false") == 0) {
+    return FALSE;
+  } else if (strcmp(identifier, "if") == 0) {
+    return IF;
+  } else if (strcmp(identifier, "else") == 0) {
+    return ELSE;
+  } else if (strcmp(identifier, "return") == 0) {
+    return RETURN;
+  } else {
+    return IDENT;
+  }
 }
 
 void skipWhiteSpace(Lexer *l) {
-    while (l->ch == ' ' || l->ch == '\t' || l->ch == '\n' || l->ch == '\r') {
-        readChar(l);
-    }
+  while (l->ch == ' ' || l->ch == '\t' || l->ch == '\n' || l->ch == '\r') {
+    readChar(l);
+  }
+}
+
+unsigned int peekChar(Lexer *l) {
+  if (l->readPosition >= strlen(l->input)) {
+    return '\0';
+  } else {
+    return l->input[l->readPosition];
+  }
 }
