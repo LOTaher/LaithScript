@@ -6,10 +6,45 @@
 int main(int argc, char *argv[]) {
   if (argc == 1) {
     // REPL
-    printf("not handling repl yet\n");
+    char *const PROMPT = ">>";
+    char input[1024]; // user input buffer
+
+    printf("Entering REPL mode. Type 'exit' to quit.\n");
+
+    while (1) {
+      printf("%s", PROMPT);
+
+      if (fgets(input, sizeof(input), stdin) == NULL) {
+        break;
+      }
+
+      // removing the new line character from the input
+      input[strcspn(input, "\n")] = 0;
+
+      // exit condition
+      if (strcmp(input, "exit") == 0) {
+        break;
+      }
+
+      // initialize the lexer
+      Lexer *lexer = newLexer(input);
+
+      // tokenization loop
+
+      Token *token;
+      while ((token = nextToken(lexer)) != NULL && token->type != EOF_TOKEN) {
+        printToken(token);
+        free(token->literal); // free the literal string inside the token
+        free(token); // free token memory after processing and printing it
+      }
+
+      // cleanup open buffers and active memory
+      free(lexer);
+    }
   }
 
   else if (argc == 2) {
+    // reading file
     if (!strcmp(strrchr(argv[1], '\0') - 3, ".lt")) {
       // the filename ends with .lt
 
@@ -67,8 +102,7 @@ int main(int argc, char *argv[]) {
       return EXIT_FAILURE;
     }
 
-  }
-  else {
+  } else {
     printf("invalid arguments\n");
     return EXIT_FAILURE;
   }
