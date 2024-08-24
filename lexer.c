@@ -29,7 +29,7 @@ Lexer *newLexer(char *input) {
 void readChar(Lexer *l) {
   // If we have reached the end of the string input, set the current character
   // to 0 (null character)
-  if (l->readPosition >= strlen(l->input)) {
+  if (l->readPosition > strlen(l->input)) {
     l->ch = '\0';
   } else {
     // Set the current character to the character at the readPosition

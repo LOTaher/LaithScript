@@ -1,11 +1,11 @@
 #include "token.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 // return the token of the character under examination
 Token *nextToken(Lexer *l) {
-  Token *tok;
-
+  Token *tok = NULL;
   skipWhiteSpace(l);
 
   switch (l->ch) {
@@ -20,11 +20,10 @@ Token *nextToken(Lexer *l) {
       tok->literal[1] = l->ch;
       tok->literal[2] = '\0';
       tok->type = EQ;
-      break;
     } else {
-      newToken(ASSIGN, l->ch);
-      break;
+      tok = newToken(ASSIGN, l->ch);
     }
+    break;
   case ';':
     tok = newToken(SEMICOLON, l->ch);
     break;
@@ -59,11 +58,10 @@ Token *nextToken(Lexer *l) {
       tok->literal[1] = l->ch;
       tok->literal[2] = '\0';
       tok->type = NOT_EQ;
-      break;
     } else {
       tok = newToken(BANG, l->ch);
-      break;
     }
+    break;
   case '/':
     tok = newToken(SLASH, l->ch);
     break;
@@ -78,18 +76,21 @@ Token *nextToken(Lexer *l) {
     break;
   case '\0':
     tok = (Token *)malloc(sizeof(Token));
-    tok->literal = "";
+    tok->literal = (char *)malloc(1);
+    tok->literal[0] = '\0';
     tok->type = EOF_TOKEN;
     break;
   default:
     // whenever one of the character isn't recognized, read for identifiers
     if (isLetter(l->ch)) {
+      tok = (Token *)malloc(sizeof(Token));
       tok->literal = readIdentifier(l);
       tok->type = lookupIdentifier(tok->literal);
       return tok;
     } else if (isDigit(l->ch)) {
-      tok->type = INT;
+      tok = (Token *)malloc(sizeof(Token));
       tok->literal = readNumber(l);
+      tok->type = INT;
     } else {
       tok = newToken(ILLEGAL, l->ch);
     }
@@ -104,9 +105,9 @@ Token *nextToken(Lexer *l) {
 Token *newToken(TokenType token, unsigned int ch) {
   Token *tok = (Token *)malloc(sizeof(Token));
 
-  tok->literal = (char *)malloc(
-      1 + sizeof(ch)); // allocating an extra byte for the null character
-  tok->literal[0] = ch;
+  tok->literal =
+      (char *)malloc(2); // allocating an extra byte for the null character
+  tok->literal[0] = (char)ch;
   tok->literal[1] = '\0';
   tok->type = token;
 
@@ -127,6 +128,10 @@ char *readIdentifier(Lexer *l) {
   char *identifier = (char *)malloc(
       lengthOfIdentifier +
       1); // allocating space for the extra null character for the string
+
+  if (!identifier) {
+    printf("memory allocation failed for identifier\n");
+  }
 
   // strncpy copies a portion (lengthOfIdentifier) of a string starting from a
   // specific position (&l->input[position]) to the assigned buffer (identifier)
@@ -150,6 +155,10 @@ char *readNumber(Lexer *l) {
 
   char *number = (char *)malloc(sizeof(lengthOfNumber) + 1);
 
+  if (!number) {
+    printf("memory allocation failed for number\n");
+  }
+
   strncpy(number, &l->input[position], lengthOfNumber);
 
   number[lengthOfNumber] = '\0';
@@ -164,7 +173,7 @@ bool isLetter(unsigned int ch) {
 // LaithScript only supports integers...
 bool isDigit(unsigned int ch) { return '0' <= ch && ch <= '9'; }
 
-TokenType lookUpIdentifier(char *identifier) {
+TokenType lookupIdentifier(char *identifier) {
   if (strcmp(identifier, "fn") == 0) {
     return FUNCTION;
   } else if (strcmp(identifier, "let") == 0) {
@@ -196,4 +205,108 @@ unsigned int peekChar(Lexer *l) {
   } else {
     return l->input[l->readPosition];
   }
+}
+
+void printToken(Token *tok) {
+  const char *typeString;
+
+  switch (tok->type) {
+  case ILLEGAL:
+    typeString = "ILLEGAL";
+    break;
+  case EOF_TOKEN:
+    typeString = "EOF";
+    break;
+
+  // Identifiers + Literals
+  case IDENT:
+    typeString = "IDENT";
+    break;
+  case INT:
+    typeString = "INT";
+    break;
+
+  // Operators
+  case ASSIGN:
+    typeString = "ASSIGN";
+    break;
+  case PLUS:
+    typeString = "PLUS";
+    break;
+  case MINUS:
+    typeString = "MINUS";
+    break;
+  case BANG:
+    typeString = "BANG";
+    break;
+  case ASTERISK:
+    typeString = "ASTERISK";
+    break;
+  case SLASH:
+    typeString = "SLASH";
+    break;
+  case EQ:
+    typeString = "EQ";
+    break;
+  case NOT_EQ:
+    typeString = "NOT_EQ";
+    break;
+
+  // Comparisons
+  case LT:
+    typeString = "LT";
+    break;
+  case GT:
+    typeString = "GT";
+    break;
+
+  // Delimiters
+  case COMMA:
+    typeString = "COMMA";
+    break;
+  case SEMICOLON:
+    typeString = "SEMICOLON";
+    break;
+  case LPAREN:
+    typeString = "LPAREN";
+    break;
+  case RPAREN:
+    typeString = "RPAREN";
+    break;
+  case LBRACE:
+    typeString = "LBRACE";
+    break;
+  case RBRACE:
+    typeString = "RBRACE";
+    break;
+
+  // Keywords
+  case FUNCTION:
+    typeString = "FUNCTION";
+    break;
+  case LET:
+    typeString = "LET";
+    break;
+  case TRUE:
+    typeString = "TRUE";
+    break;
+  case FALSE:
+    typeString = "FALSE";
+    break;
+  case IF:
+    typeString = "IF";
+    break;
+  case ELSE:
+    typeString = "ELSE";
+    break;
+  case RETURN:
+    typeString = "RETURN";
+    break;
+
+  default:
+    typeString = "UNKNOWN";
+    break;
+  }
+
+  printf("Token Type: %s, Literal: %s\n", typeString, tok->literal);
 }

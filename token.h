@@ -58,5 +58,6 @@ bool isDigit(unsigned int ch);
 TokenType lookupIdentifier(char *identifier);
 void skipWhiteSpace(Lexer *l);
 unsigned int peekChar(Lexer *l);
+void printToken(Token *tok);
 
 #endif
